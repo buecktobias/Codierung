@@ -2,7 +2,7 @@ module Lib where
 
 data BinaryTree = BinaryTree {leftSubTree::Maybe BinaryTree, rightSubTree:: Maybe BinaryTree} | Leaf Char Float deriving (Show, Eq)
 
-data Bit = Bit {v::Int}  deriving Show
+data Bit = Bit {v::Int}  deriving (Show, Eq)
 
 getValuesBits:: [Bit] -> [Int]
 getValuesBits bs = map v bs
@@ -81,6 +81,17 @@ compressChar (Just (BinaryTree l r)) c = if (elem c charL) then [Bit 0] ++ compr
   where
   charL = getChars l 
   charR = getChars r
+
+deCompressChar:: Maybe BinaryTree -> [Bit] -> (Char, [Bit])
+deCompressChar Nothing  bs= ('a', [])
+deCompressChar (Just (Leaf c f)) bs = (c, bs)
+deCompressChar (Just (BinaryTree l r)) (b:bs) = if (b == Bit 0) then deCompressChar l bs  else deCompressChar r bs
+
+deCompressText:: Maybe BinaryTree -> [Bit] -> String
+deCompressText t [] = []
+deCompressText t bs = [c] ++ (deCompressText t bs2)
+  where
+  (c, bs2) = deCompressChar t bs
 
 compressText:: Maybe BinaryTree -> String -> [Bit]
 compressText b ss = concat (map (\x -> compressChar b x) ss)
