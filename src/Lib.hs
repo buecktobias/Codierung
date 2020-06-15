@@ -1,8 +1,12 @@
 module Lib where
 
+import Data.List (group, intersperse, intercalate, elemIndex)
+import Data.Char
+
+
 data BinaryTree = BinaryTree {leftSubTree::Maybe BinaryTree, rightSubTree:: Maybe BinaryTree} | Leaf Char Float deriving (Show, Eq)
 
-data Bit = Bit {v::Int}  deriving (Show, Eq)
+data Bit = Bit {v::Int}  deriving (Show, Eq) -- 0 1
 
 getValuesBits:: [Bit] -> [Int]
 getValuesBits bs = map v bs
@@ -60,12 +64,27 @@ getTwoNextTrees bs = ((first, second), bs3)
 alphabet:: String
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+digits:: String
+digits = "0123456789"
+
+getUniques:: String -> String
+getUniques text = getUniques' text []
+
+getUniques':: String -> String -> String
+getUniques' [] uniques = uniques
+getUniques' (x:text) uniques = if (elem x uniques) then getUniques' text uniques else getUniques' text ([x] ++ uniques)
+
+getTextsAlphabet:: String -> String
+getTextsAlphabet text = getUniques text
+
 compressTreeForText:: String -> BinaryTree
 compressTreeForText text = buildCompressingTree startTrees
   where
-  frequency_alphabet = frequency text alphabet
+  frequency_alphabet = frequency text (getTextsAlphabet text)
   rFreq = relativeFrequency frequency_alphabet
   startTrees = getStartTrees rFreq
+
+
 
 buildCompressingTree:: [BinaryTree] -> BinaryTree
 buildCompressingTree [b] = b
@@ -73,6 +92,8 @@ buildCompressingTree bs = buildCompressingTree (bs2 ++ [newTree])
   where
   ((first, second), bs2) = getTwoNextTrees bs
   newTree = mergeTrees first second
+
+
 
 compressChar:: Maybe BinaryTree -> Char -> [Bit]
 compressChar Nothing _ = []
@@ -108,3 +129,43 @@ relativeFrequency freq = let summ =sum ( map (\x -> snd x) freq) in map (\tuple 
 
 countAmountEl:: [Char] -> Char -> Int
 countAmountEl list element = length (filter (\x -> x == element) list)
+
+
+unJust:: Maybe Int -> Int
+unJust Nothing = -1
+unJust (Just a )= a
+
+compressTextInt:: String -> String
+compressTextInt text = intercalate "." (map (\x -> show (unJust (elemIndex x alphabet))) text)
+
+splitTextInt:: String -> [Int]
+splitTextInt [] = []
+splitTextInt text = [numberInt] ++ splitTextInt newText 
+  where 
+  number = takeWhile (\x -> x /= '.') text
+  numberInt = read number::Int
+  newText = drop (length number + 1) text
+
+deCompressTextInt:: String -> String
+deCompressTextInt text = map (\x -> alphabet !! x)(splitTextInt text)
+
+compressTextAmountChars:: String -> String
+compressTextAmountChars text = concat (map (\g -> [head g] ++ (show (length g))) (group text))
+
+decompressTextAmountChars:: String -> String
+decompressTextAmountChars text = concat (map (\(char, amount) -> take amount (cycle [char]) )(splitText text))
+
+splitText:: String -> [(Char, Int)]
+splitText [] = []
+splitText (x:text) = [(char, amount)]  ++ splitText followingText
+              where
+              char = x
+              followingDigits = takeWhile (\x -> elem x digits) text
+              amount = read followingDigits::Int
+              followingText = drop (length followingDigits) text
+
+compressText2:: String -> Maybe BinaryTree ->  [Bit]
+compressText2 text tree = compressText tree (compressTextInt text)
+
+deCompressText2:: [Bit] -> Maybe BinaryTree -> String
+deCompressText2 bits tree = deCompressTextInt (deCompressText tree bits)
