@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 71c44a1fbd92cc013b5eb15c9236edb74ac8c656dd6889ff51717d4f8857d704
+-- hash: 54219bf717a74e5eb9912867f611341a558b1585037a61c6e13e2d77d87154df
 
 name:           Codierung
 version:        0.1.0.0
@@ -27,7 +27,10 @@ source-repository head
 
 library
   exposed-modules:
+      FrequencyAnalysis
+      HuffmanCode
       Lib
+      Tree
   other-modules:
       Paths_Codierung
   hs-source-dirs:
