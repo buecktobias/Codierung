@@ -25,6 +25,8 @@ updateList:: [a] -> Int -> a -> [a]
 updateList array index newElem = let splitted = splitAt (index) array in fst splitted ++ [newElem] ++ tail (snd splitted)
 
 -- konvertiert ein Buchstabe zu dem entsprechenden Index
+-- A -> 0
+-- Z -> 25
 charToIndex:: Char -> Int
 charToIndex c = ord c - 65
 
