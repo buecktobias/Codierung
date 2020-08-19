@@ -1,11 +1,14 @@
 module Main where
-
+import Data.Char
 import HuffmanCode
 import Tree
 import FrequencyAnalysis
 
 main :: IO ()
 main = do
+  print (frequency2 "AAAABBDBDBCAA" "ABCD")
+  
+  
   let tstl = [('A', 3::Int), ('B', 6::Int)]
   let update = increaseChar tstl 0
   print update
